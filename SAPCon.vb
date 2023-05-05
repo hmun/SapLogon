@@ -19,6 +19,7 @@ Public Class SAPCon
     Private _username As String = ""
     Private _password As String = ""
     Private _language As String = ""
+    Private _sncmyname As String = ""
 
     Public Property Connected() As Boolean
         Get
@@ -83,6 +84,15 @@ Public Class SAPCon
         End Set
     End Property
 
+    Public Property SncMyName() As String
+        Get
+            Return _sncmyname
+        End Get
+        Set(ByVal value As String)
+            _sncmyname = value
+        End Set
+    End Property
+
     Public Sub New(pAssembly As String, ByRef pConParameter As ConParameter)
         Dim parameters As New RfcConfigParameters()
 
@@ -125,7 +135,7 @@ Public Class SAPCon
         Dim formRet = 0
         If Not Connected And _destination.SncMode = "1" Then
             log.Debug("checkCon - " & "connecting using SNC destination")
-            setCredentials_SNC(_client, _language)
+            setCredentials_SNC(_client, _language, _sncmyname, _username)
         ElseIf Not Connected Then
             log.Debug("checkCon - " & "connecting using regular destination")
             setCredentials(_client, _username, _password, _language)
@@ -155,11 +165,21 @@ Public Class SAPCon
         End If
     End Function
 
-    Public Sub setCredentials_SNC(aClient As String, aLanguage As String)
+    Public Sub setCredentials_SNC(aClient As String, aLanguage As String, Optional aSncMyName As String = "", Optional aUsername As String = "")
         log.Debug("setCredentials_SNC - " & "setting credentials")
         Try
             Destination.Client = aClient
             Destination.Language = aLanguage
+            If Not String.IsNullOrEmpty(aSncMyName) Then
+                Destination.SncMyName = aSncMyName
+            End If
+            If Not String.IsNullOrEmpty(aUsername) Then
+                Destination.User = aUsername
+            End If
+            log.Debug("setCredentials_SNC - " & " Destination.Client=" & Destination.Client)
+            log.Debug("setCredentials_SNC - " & " Destination.Language=" & Destination.Language)
+            log.Debug("setCredentials_SNC - " & " Destination.User=" & Destination.User)
+            log.Debug("setCredentials_SNC - " & " Destination.SncMyName=" & Destination.SncMyName)
         Catch ex As System.Exception
             '            MsgBox("setCredentials failed! " & ex.Message, MsgBoxStyle.OkOnly Or MsgBoxStyle.Critical, "SapCon")
             log.Error("setCredentials_SNC - Exception=" & ex.ToString)

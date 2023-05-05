@@ -35,10 +35,10 @@ Public Class SapExcelDestinationConfiguration
             End If
         End Sub
 
-        Public Shared Sub ConfigAddOrChangeDestination(pAssembly As String)
-            Dim conParam() As String = {"Name", "AppServerHost", "SystemNumber", "SystemID", "Client", "Language", "SncMode", "SncPartnerName"}
-            Dim conParameter As New ConParameter
-            Dim parameters As New RfcConfigParameters()
+    Public Shared Sub ConfigAddOrChangeDestination(pAssembly As String)
+        Dim conParam() As String = {"Name", "AppServerHost", "SystemNumber", "SystemID", "Client", "Language", "SncMode", "SncPartnerName"}
+        Dim conParameter As New ConParameter
+        Dim parameters As New RfcConfigParameters()
 
         Dim appData As String = GetFolderPath(Environment.SpecialFolder.ApplicationData)
         Dim configFile = Uri.UnescapeDataString(appData & "\SapExcel\" & pAssembly & "\sap_connections.config")
@@ -50,12 +50,12 @@ Public Class SapExcelDestinationConfiguration
                 appData = Path.GetDirectoryName(appData)
                 configFile = Uri.UnescapeDataString(appData & "\sap_connections.config")
                 If Not System.IO.File.Exists(configFile) Then
-                        configFile = ""
-                    End If
+                    configFile = ""
                 End If
             End If
-            Dim config As Configuration
-            Dim configMap As New ExeConfigurationFileMap
+        End If
+        Dim config As Configuration
+        Dim configMap As New ExeConfigurationFileMap
         If Not configFile = "" Then
             Try
                 configMap.ExeConfigFilename = configFile
@@ -74,45 +74,48 @@ Public Class SapExcelDestinationConfiguration
             End Try
         End If
         Dim conRec As ConParamterRec
-            For Each conRec In conParameter.aConCol.Values
-                parameters = New RfcConfigParameters()
-                parameters(RfcConfigParameters.Name) = conRec.aName.Value
-                parameters(RfcConfigParameters.PeakConnectionsLimit) = "5"
-                parameters(RfcConfigParameters.ConnectionIdleTimeout) = "600" '' 600 seconds, i.e. 10 minutes
-                If conRec.aAppServerHost.Value IsNot Nothing Then
-                    parameters(RfcConfigParameters.AppServerHost) = conRec.aAppServerHost.Value
-                    parameters(RfcConfigParameters.SystemNumber) = CInt(conRec.aSystemNumber.Value)
-                ElseIf conRec.aMessageServerHost.Value IsNot Nothing Then
-                    parameters(RfcConfigParameters.MessageServerHost) = conRec.aMessageServerHost.Value
-                    parameters(RfcConfigParameters.LogonGroup) = conRec.aLogonGroup.Value
+        For Each conRec In conParameter.aConCol.Values
+            parameters = New RfcConfigParameters()
+            parameters(RfcConfigParameters.Name) = conRec.aName.Value
+            parameters(RfcConfigParameters.PeakConnectionsLimit) = "5"
+            parameters(RfcConfigParameters.ConnectionIdleTimeout) = "600" '' 600 seconds, i.e. 10 minutes
+            If Not String.IsNullOrEmpty(conRec.aAppServerHost.Value) Then
+                parameters(RfcConfigParameters.AppServerHost) = conRec.aAppServerHost.Value
+                parameters(RfcConfigParameters.SystemNumber) = CInt(conRec.aSystemNumber.Value)
+            ElseIf Not String.IsNullOrEmpty(conRec.aMessageServerHost.Value) Then
+                parameters(RfcConfigParameters.MessageServerHost) = conRec.aMessageServerHost.Value
+                parameters(RfcConfigParameters.LogonGroup) = conRec.aLogonGroup.Value
+            End If
+            parameters(RfcConfigParameters.SystemID) = conRec.aSystemID.Value
+            If Not String.IsNullOrEmpty(conRec.aTrace.Value) Then
+                parameters(RfcConfigParameters.Trace) = conRec.aTrace.Value
+            End If
+            If Not String.IsNullOrEmpty(conRec.aClient.Value) Then
+                parameters(RfcConfigParameters.Client) = conRec.aClient.Value
+            End If
+            If Not String.IsNullOrEmpty(conRec.aLanguage.Value) Then
+                parameters(RfcConfigParameters.Language) = conRec.aLanguage.Value
+            End If
+            If Not String.IsNullOrEmpty(conRec.aSncMode.Value) Then
+                parameters(RfcConfigParameters.SncMode) = conRec.aSncMode.Value
+                parameters(RfcConfigParameters.SncPartnerName) = conRec.aSncPartnerName.Value
+                If Not String.IsNullOrEmpty(conRec.aSncMyName.Value) Then
+                    parameters(RfcConfigParameters.SncMyName) = conRec.aSncMyName.Value
                 End If
-                parameters(RfcConfigParameters.SystemID) = conRec.aSystemID.Value
-                If conRec.aTrace.Value IsNot Nothing Then
-                    parameters(RfcConfigParameters.Trace) = conRec.aTrace.Value
-                End If
-                If conRec.aClient.Value IsNot Nothing Then
-                    parameters(RfcConfigParameters.Client) = conRec.aClient.Value
-                End If
-                If conRec.aLanguage.Value IsNot Nothing Then
-                    parameters(RfcConfigParameters.Language) = conRec.aLanguage.Value
-                End If
-                If conRec.aSncMode.Value IsNot Nothing Then
-                    parameters(RfcConfigParameters.SncMode) = conRec.aSncMode.Value
-                    parameters(RfcConfigParameters.SncPartnerName) = conRec.aSncPartnerName.Value
-                    If conRec.aSncMyName.Value IsNot Nothing Then
-                        parameters(RfcConfigParameters.SncMyName) = conRec.aSncMyName.Value
-                    End If
-                End If
-                log.Debug("ConfigAddOrChangeDestination - inMemoryDestinationConfiguration.AddOrEditDestination Name=" & conRec.aName.Value)
-                Try
-                    inMemoryDestinationConfiguration.AddOrEditDestination(parameters)
-                Catch Exc As System.Exception
-                    log.Error("ConfigAddOrChangeDestination - Exception=" & Exc.ToString)
-                End Try
-            Next
-        End Sub
+            End If
+            If Not String.IsNullOrEmpty(conRec.aSAPRouter.Value) Then
+                parameters(RfcConfigParameters.SAPRouter) = conRec.aSAPRouter.Value
+            End If
+            log.Debug("ConfigAddOrChangeDestination - inMemoryDestinationConfiguration.AddOrEditDestination Name=" & conRec.aName.Value)
+            Try
+                inMemoryDestinationConfiguration.AddOrEditDestination(parameters)
+            Catch Exc As System.Exception
+                log.Error("ConfigAddOrChangeDestination - Exception=" & Exc.ToString)
+            End Try
+        Next
+    End Sub
 
-        Public Shared Sub ExcelAddOrChangeDestination(pConParameter As ConParameter)
+    Public Shared Sub ExcelAddOrChangeDestination(pConParameter As ConParameter)
         Dim parameters As New RfcConfigParameters()
         Dim conRec As ConParamterRec
         For Each conRec In pConParameter.aConCol.Values
@@ -120,29 +123,32 @@ Public Class SapExcelDestinationConfiguration
             parameters(RfcConfigParameters.Name) = conRec.aName.Value
             parameters(RfcConfigParameters.PeakConnectionsLimit) = "5"
             parameters(RfcConfigParameters.ConnectionIdleTimeout) = "600" '' 600 seconds, i.e. 10 minutes
-            If conRec.aAppServerHost.Value IsNot Nothing Then
+            If Not String.IsNullOrEmpty(conRec.aAppServerHost.Value) Then
                 parameters(RfcConfigParameters.AppServerHost) = conRec.aAppServerHost.Value
                 parameters(RfcConfigParameters.SystemNumber) = CInt(conRec.aSystemNumber.Value)
-            ElseIf conRec.aMessageServerHost.Value IsNot Nothing Then
+            ElseIf Not String.IsNullOrEmpty(conRec.aMessageServerHost.Value) Then
                 parameters(RfcConfigParameters.MessageServerHost) = conRec.aMessageServerHost.Value
                 parameters(RfcConfigParameters.LogonGroup) = conRec.aLogonGroup.Value
             End If
             parameters(RfcConfigParameters.SystemID) = conRec.aSystemID.Value
-            If conRec.aTrace.Value IsNot Nothing Then
+            If Not String.IsNullOrEmpty(conRec.aTrace.Value) Then
                 parameters(RfcConfigParameters.Trace) = conRec.aTrace.Value
             End If
-            If conRec.aClient.Value IsNot Nothing Then
+            If Not String.IsNullOrEmpty(conRec.aClient.Value) Then
                 parameters(RfcConfigParameters.Client) = conRec.aClient.Value
             End If
-            If conRec.aLanguage.Value IsNot Nothing Then
+            If Not String.IsNullOrEmpty(conRec.aLanguage.Value) Then
                 parameters(RfcConfigParameters.Language) = conRec.aLanguage.Value
             End If
-            If conRec.aSncMode.Value IsNot Nothing Then
+            If Not String.IsNullOrEmpty(conRec.aSncMode.Value) Then
                 parameters(RfcConfigParameters.SncMode) = conRec.aSncMode.Value
                 parameters(RfcConfigParameters.SncPartnerName) = conRec.aSncPartnerName.Value
-                If conRec.aSncMyName.Value IsNot Nothing Then
+                If Not String.IsNullOrEmpty(conRec.aSncMyName.Value) Then
                     parameters(RfcConfigParameters.SncMyName) = conRec.aSncMyName.Value
                 End If
+            End If
+            If Not String.IsNullOrEmpty(conRec.aSAPRouter.Value) Then
+                parameters(RfcConfigParameters.SAPRouter) = conRec.aSAPRouter.Value
             End If
             Try
                 log.Debug("ExcelAddOrChangeDestination - inMemoryDestinationConfiguration.AddOrEditDestination Name=" & conRec.aName.Value)

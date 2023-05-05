@@ -18,6 +18,7 @@ Public Class ConParamterRec
     Public aSncMode As TField
     Public aSncMyName As TField
     Public aSncPartnerName As TField
+    Public aSAPRouter As TField
 
     Public Sub New()
         aID = New TField
@@ -33,25 +34,51 @@ Public Class ConParamterRec
         aSncMode = New TField
         aSncMyName = New TField
         aSncPartnerName = New TField
+        aSAPRouter = New TField
     End Sub
 
     Public Sub setValues(pId As Integer, pSapConnectionConfigElement As SAPCommon.SapConnectionConfigElement)
         aID = New TField("ID", CStr(pId))
         aName = New TField("Name", CStr(pSapConnectionConfigElement.Name))
-        aAppServerHost = New TField("AppServerHost", CStr(pSapConnectionConfigElement.AppServerHost))
         aSystemNumber = New TField("SystemNumber", CStr(pSapConnectionConfigElement.SystemNumber))
         aSystemID = New TField("SystemID", CStr(pSapConnectionConfigElement.SystemID))
-        aMessageServerHost = New TField("MessageServerHost", CStr(pSapConnectionConfigElement.MessageServerHost))
-        aLogonGroup = New TField("LogonGroup", CStr(pSapConnectionConfigElement.LogonGroup))
-        aTrace = New TField("Trace", CStr(pSapConnectionConfigElement.Trace))
         aClient = New TField("Client", CStr(pSapConnectionConfigElement.Client))
         aLanguage = New TField("Language", CStr(pSapConnectionConfigElement.Language))
-        aSncMode = New TField("SncMode", CStr(pSapConnectionConfigElement.SncMode))
-        aSncMyName = New TField("SncMyName", CStr(pSapConnectionConfigElement.SncMyName))
-        aSncPartnerName = New TField("SncPartnerName", CStr(pSapConnectionConfigElement.SncPartnerName))
+        Try
+            aAppServerHost = New TField("AppServerHost", CStr(pSapConnectionConfigElement.AppServerHost))
+        Catch Exc As System.Exception
+        End Try
+        Try
+            aMessageServerHost = New TField("MessageServerHost", CStr(pSapConnectionConfigElement.MessageServerHost))
+        Catch Exc As System.Exception
+        End Try
+        Try
+            aLogonGroup = New TField("LogonGroup", CStr(pSapConnectionConfigElement.LogonGroup))
+        Catch Exc As System.Exception
+        End Try
+        Try
+            aTrace = New TField("Trace", CStr(pSapConnectionConfigElement.Trace))
+        Catch Exc As System.Exception
+        End Try
+        Try
+            aSncMode = New TField("SncMode", CStr(pSapConnectionConfigElement.SncMode))
+        Catch Exc As System.Exception
+        End Try
+        Try
+            aSncMyName = New TField("SncMyName", CStr(pSapConnectionConfigElement.SncMyName))
+        Catch Exc As System.Exception
+        End Try
+        Try
+            aSncPartnerName = New TField("SncPartnerName", CStr(pSapConnectionConfigElement.SncPartnerName))
+        Catch Exc As System.Exception
+        End Try
+        Try
+            aSAPRouter = New TField("SAPRouter", CStr(pSapConnectionConfigElement.SAPRouter))
+        Catch Exc As System.Exception
+        End Try
     End Sub
 
-    Public Sub setValues(pID As String, pName As String, pAppServerHost As String, pSystemNumber As String, pSystemID As String, pMessageServerHost As String, pLogonGroup As String, pTrace As String, pClient As String, pLanguage As String, pSncMode As String, pSncMyName As String, pSncPartnerName As String)
+    Public Sub setValues(pID As String, pName As String, pAppServerHost As String, pSystemNumber As String, pSystemID As String, pMessageServerHost As String, pLogonGroup As String, pTrace As String, pClient As String, pLanguage As String, pSncMode As String, pSncMyName As String, pSncPartnerName As String, Optional pSAPRouter As String = "")
         aID = New TField("ID", CStr(pID))
         aName = New TField("Name", CStr(pName))
         aAppServerHost = New TField("AppServerHost", CStr(pAppServerHost))
@@ -65,6 +92,7 @@ Public Class ConParamterRec
         aSncMode = New TField("SncMode", CStr(pSncMode))
         aSncMyName = New TField("SncMyName", CStr(pSncMyName))
         aSncPartnerName = New TField("SncPartnerName", CStr(pSncPartnerName))
+        aSAPRouter = New TField("SAPRouter", CStr(pSAPRouter))
     End Sub
 
     Public Sub setValue(pField As String, pValue As String)
@@ -94,6 +122,8 @@ Public Class ConParamterRec
             aSncMyName = New TField(pField, CStr(pValue))
         ElseIf pField = "SncPartnerName" Then
             aSncPartnerName = New TField(pField, CStr(pValue))
+        ElseIf pField = "SAPRouter" Then
+            aSAPRouter = New TField(pField, CStr(pValue))
         End If
     End Sub
 
@@ -133,15 +163,15 @@ Public Class ConParameter
         End If
     End Sub
 
-    Public Sub addCon(pID As String, pName As String, pAppServerHost As String, pSystemNumber As String, pSystemID As String, pMessageServerHost As String, pLogonGroup As String, pTrace As String, pClient As String, pLanguage As String, pSncMode As String, pSncMyName As String, pSncPartnerName As String)
+    Public Sub addCon(pID As String, pName As String, pAppServerHost As String, pSystemNumber As String, pSystemID As String, pMessageServerHost As String, pLogonGroup As String, pTrace As String, pClient As String, pLanguage As String, pSncMode As String, pSncMyName As String, pSncPartnerName As String, Optional pSAPRouter As String = "")
         Dim aConRec As New ConParamterRec
         Dim aKey As String
         aKey = pID
         If aConCol.TryGetValue(aKey, aConRec) Then
-            aConRec.setValues(pID, pName, pAppServerHost, pSystemNumber, pSystemID, pMessageServerHost, pLogonGroup, pTrace, pClient, pLanguage, pSncMode, pSncMyName, pSncPartnerName)
+            aConRec.setValues(pID, pName, pAppServerHost, pSystemNumber, pSystemID, pMessageServerHost, pLogonGroup, pTrace, pClient, pLanguage, pSncMode, pSncMyName, pSncPartnerName, pSAPRouter)
         Else
             aConRec = New ConParamterRec
-            aConRec.setValues(pID, pName, pAppServerHost, pSystemNumber, pSystemID, pMessageServerHost, pLogonGroup, pTrace, pClient, pLanguage, pSncMode, pSncMyName, pSncPartnerName)
+            aConRec.setValues(pID, pName, pAppServerHost, pSystemNumber, pSystemID, pMessageServerHost, pLogonGroup, pTrace, pClient, pLanguage, pSncMode, pSncMyName, pSncPartnerName, pSAPRouter)
             aConCol.Add(aKey, aConRec)
         End If
     End Sub
