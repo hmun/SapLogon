@@ -16,8 +16,12 @@ Public Class SAPZ_BC_EXCEL_ADDIN_VERS_CHK
         _destination = aSapCon.getDestination()
         log.Debug("New - " & "creating Function Z_BC_EXCEL_ADDIN_VERS_CHK")
         Try
-            oRfcFunction = _destination.Repository.CreateFunction("Z_BC_EXCEL_ADDIN_VERS_CHK")
-            log.Debug("New - " & "oRfcFunction.Metadata.Name=" & oRfcFunction.Metadata.Name)
+            If _destination.Repository.CheckFunctionExists("Z_BC_EXCEL_ADDIN_VERS_CHK") Then
+                oRfcFunction = _destination.Repository.CreateFunction("Z_BC_EXCEL_ADDIN_VERS_CHK")
+                log.Debug("New - " & "oRfcFunction.Metadata.Name=" & oRfcFunction.Metadata.Name)
+            Else
+                oRfcFunction = Nothing
+            End If
         Catch ex As Exception
             oRfcFunction = Nothing
             log.Warn("New - Exception=" & ex.ToString)
